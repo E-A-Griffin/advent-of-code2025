@@ -1,0 +1,28 @@
+(ns day1.core
+  (:require [clojure.string :as str]))
+
+(def start 50)
+
+(def max-val 99)
+
+(defn parse-command
+  [[l-or-r & n]]
+  ((if (= \L l-or-r)
+    -
+    +)
+   (parse-long (apply str n))))
+
+(def parse-file (comp (partial map parse-command) str/split-lines slurp))
+
+(defn -main [f]
+  (let [cmds (parse-file f)
+        {:keys [cnt pos]} (reduce (fn [acc cur]
+                                    (let [npos (mod (+ (:pos acc) cur) (inc max-val))]
+                                      (cond-> acc
+                                        (zero? npos) (update :cnt inc)
+                                        :always      (assoc :pos npos))))
+                                  {:cnt 0 :pos start}
+                                  cmds)]
+    (println "Password: " cnt)
+    (println "Final position: " pos)
+    cnt))

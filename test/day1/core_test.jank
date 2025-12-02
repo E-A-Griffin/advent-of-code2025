@@ -1,0 +1,13 @@
+(ns day1.core-test
+  (:require [clojure.test :refer [deftest is]]
+            [day1.core :as sut]))
+
+(def simple-test-file "resources/day1/simple-input.txt")
+
+(def advanced-test-file "resources/day1/input.txt")
+
+(deftest simple-test
+  (is (= 3 (sut/-main simple-test-file))))
+
+(deftest advanced-test
+  (is (= 1118 (sut/-main advanced-test-file))))
