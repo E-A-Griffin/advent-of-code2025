@@ -1,0 +1,1 @@
+While [[https://github.com/jank-lang/jank][jank]] is still pre-alpha I thought I'd try it out for Advent of Code.
