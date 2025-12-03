@@ -1,0 +1,26 @@
+(ns day2.core
+  (:require [clojure.string :as str]))
+
+(defn palindrome?
+  [s]
+  (= (subs s 0 (/ (count s) 2))
+     (subs s (/ (count s) 2))))
+
+(defn parse-command
+  [cmd]
+  (let [[_ start end] (re-matches #"([0-9]+)-([0-9]+)" cmd)
+        nums (range (parse-long start) (inc (parse-long end)))]
+    nums))
+
+(defn count-palindromes
+  [nums]
+  (reduce + (filter (comp palindrome? str) nums)))
+
+(def parse-file (comp (partial map parse-command)
+                      #(str/split % #"[,\n]+")
+                      slurp))
+
+(defn -main [f]
+  (let [cmds (parse-file f)]
+    (reduce (fn [cnt cmd]
+              (+ cnt (count-palindromes cmd))) 0 cmds)))
