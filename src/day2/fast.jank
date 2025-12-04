@@ -1,0 +1,88 @@
+(ns day2.fast
+  (:require [clojure.string :as str]))
+
+(cpp/raw "
+  #include <string>
+  #include <vector>
+  #include <cmath>
+
+  bool is_repeated_str(const std::string& s) {
+    size_t len = s.length();
+    if (s.length() % 2)
+      return false;
+    for (int i = 0; i < (len / 2); ++i)
+      if (s[i] != s[(len / 2) + i])
+        return false;
+    return true;
+    }
+
+  std::vector<std::string> partition_all(size_t n, const std::string& s) {
+    size_t n_partitions = ceil(s.length() / (double)n);
+    std::vector<std::string> v(n_partitions);
+
+    for (size_t i = 0; i < n_partitions; ++i)
+      v[i] = s.substr(i*n,n);
+
+    return v;
+  }
+
+  bool partitions_eq(const std::vector<std::string>& v) {
+    std::string first = v[0];
+    for (auto s : v)
+      if (s != first)
+        return false;
+    return true;
+  }
+
+
+  bool is_recursive_repeated_str(size_t n, const std::string& s) {
+    std::vector<std::string> partitions = partition_all(n, s);
+    return partitions.size() > 1 &&
+      (partitions_eq(partitions) || is_recursive_repeated_str(n+1, s));
+  }
+")
+
+(defn repeated-str?
+  "True iff `s` can be split down the middle with the same two substrings on
+  each side"
+  [s]
+  (cpp/is_repeated_str s))
+
+(defn recursive-repeated-str?
+  "True iff `s` can be split down the middle with the same substring rpepeated
+  any num of times
+
+  ex:
+  (recursive-repeated-str? 1 \"101010\") => true
+  (recursive-repeated-str? 1 \"10101\") => false
+  (recursive-repeated-str? 1 \"111\") => true"
+  [n s]
+  (cpp/is_recursive_repeated_str n s))
+
+(defn parse-command
+  [cmd]
+  (let [[_ start end] (re-matches #"([0-9]+)-([0-9]+)" cmd)
+        nums (range (parse-long start) (inc (parse-long end)))]
+    nums))
+
+(defn count-repeated
+  [nums]
+  (reduce + (filter (comp repeated-str? str) nums)))
+
+(defn recursive-count-repeated
+  [nums]
+  (reduce + (filter (comp (partial recursive-repeated-str? 1) str) nums)))
+
+(def parse-file (comp (partial map parse-command)
+                      #(str/split % #"[,\n]+")
+                      slurp))
+
+(defn pt-1 [f]
+  (let [cmds (parse-file f)]
+    (reduce (fn [cnt cmd]
+              (+ cnt (count-repeated cmd))) 0 cmds)))
+
+(defn pt-2 [f]
+  (let [cmds (parse-file f)]
+    (reduce (fn [cnt cmd]
+              (+ cnt (recursive-count-repeated cmd))) 0 cmds)))

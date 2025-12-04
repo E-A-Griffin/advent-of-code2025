@@ -1,6 +1,6 @@
-(ns day2.core-test
+(ns day2.fast-test
   (:require [clojure.test :refer [deftest is]]
-            [day2.core :as sut]))
+            [day2.fast :as sut]))
 
 (def simple-test-file "resources/day2/simple-input.txt")
 
@@ -15,6 +15,5 @@
 (deftest simple2-test
   (is (= 4174379265 (sut/pt-2 simple-test-file))))
 
-;; TODO: check this
 (deftest advanced2-test
   (is (= 27469417404 (sut/pt-2 advanced-test-file))))

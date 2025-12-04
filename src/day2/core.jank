@@ -1,10 +1,26 @@
 (ns day2.core
   (:require [clojure.string :as str]))
 
-(defn palindrome?
+(defn repeated-str?
+  "True iff `s` can be split down the middle with the same two substrings on
+  each side"
   [s]
   (= (subs s 0 (/ (count s) 2))
      (subs s (/ (count s) 2))))
+
+(defn recursive-repeated-str?
+  "True iff `s` can be split down the middle with the same substring rpepeated
+  any num of times
+
+  ex:
+  (recursive-repeated-str? 1 \"101010\") => true
+  (recursive-repeated-str? 1 \"10101\") => false
+  (recursive-repeated-str? 1 \"111\") => true"
+  [n s]
+  (let [partitions (partition-all n s)]
+    (and (> (count partitions) 1)
+         (or (apply = partitions)
+             (recur (inc n) s)))))
 
 (defn parse-command
   [cmd]
@@ -12,15 +28,20 @@
         nums (range (parse-long start) (inc (parse-long end)))]
     nums))
 
-(defn count-palindromes
-  [nums]
-  (reduce + (filter (comp palindrome? str) nums)))
+(defn count-repeated
+  [f nums]
+  (reduce + (filter (comp f str) nums)))
 
 (def parse-file (comp (partial map parse-command)
                       #(str/split % #"[,\n]+")
                       slurp))
 
-(defn -main [f]
+(defn pt-1 [f]
   (let [cmds (parse-file f)]
     (reduce (fn [cnt cmd]
-              (+ cnt (count-palindromes cmd))) 0 cmds)))
+              (+ cnt (count-repeated repeated-str? cmd))) 0 cmds)))
+
+(defn pt-2 [f]
+  (let [cmds (parse-file f)]
+    (reduce (fn [cnt cmd]
+              (+ cnt (count-repeated (partial recursive-repeated-str? 1) cmd))) 0 cmds)))
