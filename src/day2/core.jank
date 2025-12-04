@@ -18,9 +18,6 @@
   (recursive-repeated-str? 1 \"111\") => true"
   [n s]
   (let [partitions (partition-all n s)]
-    ;; (println "partitions" partitions)
-    ;; (println "(> (count partitions) 1)" (> (count partitions) 1))
-    ;; (println "(apply = (partition n s))" (apply = (partition n s)))
     (and (> (count partitions) 1)
          (or (apply = partitions)
              (recur (inc n) s)))))
